@@ -25,6 +25,17 @@ class Vector:
         self.set(new_v.x, new_v.y)
         return self
 
+    def dot_product(self, v2):
+        return self.get_mag() * v2.get_mag() * np.cos(self.angle_between(v2))
+
+    def angle_between(self, vector):
+        return np.arccos(((self.x * vector.x) + (self.y * vector.y)) / (self.get_mag() * vector.get_mag()))
+
+    def vector_projection(self, v2):
+        v2c = v2.copy().normalize()
+        scalar_projection = self.dot_product(v2c)
+        return v2c.mult(scalar_projection)
+
     def set(self, x, y):
         self.x = x
         self.y = y
