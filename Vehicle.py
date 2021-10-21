@@ -13,12 +13,12 @@ class Vehicle:
         self.surface = surface
         self.color = (255, 255, 0)
         self.pos = Vector(x, y)
-        self.vel = Vector(0, 0)
+        self.vel = Vector(-1, 0)
         self.acc = Vector(0, 0)
-        self.maxSpeed = 10
-        self.maxForce = 0.4
+        self.maxSpeed = 4
+        self.maxForce = 0.1
         self.r = 16
-        self.wander_angle = 0#random.randint(0, round(np.pi * 200)) / 100
+        self.wander_angle = 0  # random.randint(0, round(np.pi * 200)) / 100
         self.mass = 1
         self.last_force = Vector(0, 0)
 
@@ -99,6 +99,36 @@ class Vehicle:
         # limit to max force
         wander_force.limit(self.maxForce)
         return wander_force
+
+    def follow(self, path, draw=False):
+        # predict future position of vehicle
+        future = self.vel.copy()
+        future.mult(20)  # how far to look in future
+        future.add(self.pos)
+
+        # find projection target
+        v1 = Vector.static_sub(future, path.start)
+        v2 = Vector.static_sub(path.end, path.start)
+        vec_proj = v1.vector_projection(v2)
+        tar = Vector.static_add(path.start, vec_proj)
+        # move target along path a little
+        target = Vector.static_add(tar, (Vector.static_sub(path.end, path.start).set_mag(20)))
+        if draw:
+            pygame.draw.line(self.surface, (255, 255, 255), (self.pos.x, self.pos.y), (future.x, future.y), 3)
+            pygame.draw.line(self.surface, (255, 255, 255), (future.x, future.y), (tar.x, tar.y), 3)
+            pygame.draw.line(self.surface, (255, 255, 255), (tar.x, tar.y), (target.x, target.y), 3)
+            pygame.draw.circle(self.surface, (255, 0, 0), (future.x, future.y), 5)  # future point
+            pygame.draw.circle(self.surface, (0, 255, 0), (tar.x, tar.y), 5)  # projection point
+            pygame.draw.circle(self.surface, (0, 0, 255), (target.x, target.y), 5)  # look ahead
+
+        # is target on path? if yes do nothing
+        d = Vector.dist(target, future)
+        if d < path.radius:
+            steering_force = Vector(0, 0)
+        else:  # if no find the projection point
+            steering_force = self.seek(target)
+        # seek proj point
+        return steering_force
 
     def apply_force(self, force):
         force.divide(self.mass)
