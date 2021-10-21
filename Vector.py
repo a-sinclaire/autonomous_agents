@@ -1,10 +1,15 @@
 import numpy as np
 import random
 
+
 class Vector:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
+    @staticmethod
+    def static_add(v1, v2):
+        return Vector(v1.x+v2.x, v1.y+v2.y)
 
     def add(self, vector):
         self.x += vector.x
@@ -69,4 +74,9 @@ class Vector:
         magnitude = self.get_mag()
         self.x = np.cos(angle) * magnitude
         self.y = np.sin(angle) * magnitude
+        return self
+
+    def divide(self, div):
+        self.x /= div
+        self.y /= div
         return self

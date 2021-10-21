@@ -27,7 +27,9 @@ while running:
     target = Vector(mx, my)
     # pygame.draw.circle(screen, (255, 0, 0), (target.x, target.y), 10)
 
-    steering = vehicle.arrive(target)
+    # steering = vehicle.arrive(target)
+    # vehicle.apply_force(steering)
+    steering = vehicle.wander(0.5, draw=False)
     vehicle.apply_force(steering)
 
     # d = Vector.dist(vehicle.pos, target.pos)
@@ -41,7 +43,7 @@ while running:
     pygame.draw.circle(screen, (255, 0, 0), (target.x, target.y), 10)
 
     vehicle.update()
-    vehicle.draw()
+    vehicle.draw(draw_vectors=False, draw_path=True)
     vehicle.edges(WIDTH, HEIGHT)
 
     pygame.display.flip()
